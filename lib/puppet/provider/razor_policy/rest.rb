@@ -53,26 +53,26 @@ Puppet::Type.type(:razor_policy).provide :rest, :parent => Puppet::Provider::Res
   
   def self.get_policy(name)
     rest = get_rest_info
-    url = "http://#{rest[:ip]}:#{rest[:port]}/api/collections/policies/#{name}" 
+    url = "https://#{rest[:ip]}:#{rest[:port]}/api/collections/policies/#{name}"
     
     get_object(name, url)    
   end
-  
+
   private  
   def create_policy
-    # The fun with - and _ just doesn't stop. Razor => fix your API! Ruby does not like - in variables !!
-    resourceHash = {                    
+    resourceHash = {
       :name           => resource[:name],        
       :repo           => resource[:repo],
       :task           => resource[:task],
       :broker         => resource[:broker],
       :hostname       => resource[:hostname],
       :root_password  => resource[:root_password],
-      'max-count'     => resource[:max_count].to_i,
+      :max_count      => resource[:max_count].nil? ? nil : resource[:max_count].to_i,
+      :no_max_count   => resource[:no_max_count],
       :node_metadata  => resource[:node_metadata],
       :tags           => resource[:tags],
-    }
-    
+    }.delete_if {|k,v| v.nil? }
+
     if (resource[:before_policy] != nil)
       resourceHash[:before] = resource[:before_policy]
     end
@@ -119,10 +119,9 @@ Puppet::Type.type(:razor_policy).provide :rest, :parent => Puppet::Provider::Res
     end
     
     if current_state[:max_count] != @property_hash[:max_count]
-      # More magic with - and _
-      resourceHash = {                    
+      resourceHash = {
         :name       => resource[:name],
-        "max-count"  => @property_hash[:max_count],
+        :max_count  => @property_hash[:max_count],
       }
       post_command('modify-policy-max-count', resourceHash)
       updated = true

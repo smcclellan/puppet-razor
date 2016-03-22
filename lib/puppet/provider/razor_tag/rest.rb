@@ -38,7 +38,7 @@ Puppet::Type.type(:razor_tag).provide :rest, :parent => Puppet::Provider::Rest d
   
   def self.get_tag(name)
     rest = get_rest_info
-    url = "http://#{rest[:ip]}:#{rest[:port]}/api/collections/tags/#{name}" 
+    url = "https://#{rest[:ip]}:#{rest[:port]}/api/collections/tags/#{name}"
     
     get_object(name, url)    
   end

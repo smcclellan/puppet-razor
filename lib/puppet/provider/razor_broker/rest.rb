@@ -39,7 +39,7 @@ Puppet::Type.type(:razor_broker).provide :rest, :parent => Puppet::Provider::Res
   
   def self.get_broker(name)
     rest = get_rest_info
-    url = "http://#{rest[:ip]}:#{rest[:port]}/api/collections/brokers/#{name}" 
+    url = "https://#{rest[:ip]}:#{rest[:port]}/api/collections/brokers/#{name}"
     
     get_object(name, url)    
   end
@@ -48,9 +48,9 @@ Puppet::Type.type(:razor_broker).provide :rest, :parent => Puppet::Provider::Res
   def create_broker  
     resourceHash = {                    
       :name           => resource[:name],
-      'broker_type'   => resource['broker_type'],
+      :broker_type    => resource['broker_type'],
       :configuration  => resource['configuration'],
-    }      
+    }.delete_if {|k,v| v.nil? }
     post_command('create-broker', resourceHash)
   end
   
